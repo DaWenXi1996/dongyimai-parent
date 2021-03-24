@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+    <!--    不做安全验证的配置-->
+    <security:http pattern="/favicon.ico" security="none"/>
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/js/**" security="none"/>
+    <security:http pattern="/plugins/**" security="none"/>
+    <security:http pattern="/shoplogin.html" security="none"/>
+    <security:http pattern="/register.html" security="none"/>
+    <security:http pattern="/seller/add.do" security="none"/>
+    <!--    安全验证的配置(需要用户登录)-->
+    <security:http use-expressions="false">   <!--use-expressions  不使用Spring表达式-->
+        <!--pattern="/**" ** 该目录及子目录下所有资源    access 权限规则  注意： ROLE_*  -->
+        <security:intercept-url pattern="/**" access="ROLE_SELLER"/>
+        <!--form-login  表示通过form表单进行登录操作-->
+        <!--        login-page 自定义登录页-->
+        <!--        default-target-ur 验证成功后默认跳转页-->
+        <!--        authentication-failure-url  验证失败后跳转页-->
+        <security:form-login login-page="/shoplogin.html" default-target-url="/admin/index.html" always-use-default-target="true"
+                             authentication-failure-url="/shoplogin.html"/>
+        <!--SpringSecurity 4.X版本后 默认 防 CSRF 跨站请求伪造 是开启-->
+        <security:csrf disabled="true"/>
+        <security:headers>
+            <security:frame-options policy="SAMEORIGIN"/>
+        </security:headers>
+        <!--        退出登录-->
+        <security:logout/>
+    </security:http>
+
+    <!--    安全验证管理器的配置-->
+    <security:authentication-manager>
+        <!--自定义认证类-->
+        <security:authentication-provider user-service-ref="userDetailService">
+            <security:password-encoder ref="bCryptPasswordEncoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--声明自定义认证类-->
+    <bean class="com.offcn.shop.service.UserDetailServiceImpl" id="userDetailService"/>
+    <!--声明密码加密方式-->
+    <bean class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" id="bCryptPasswordEncoder"/>
+
+</beans>

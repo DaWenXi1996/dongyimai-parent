@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:dubbot="http://code.alibabatech.com/schema/dubbo"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <context:component-scan base-package="com.offcn.shop.controller"/>
+    <!--加载属性文件-->
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <!--请求、响应的数据格式 统一使用JSON数据格式-->
+            <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes" value="application/json"/>
+                <property name="features">
+                    <array>
+                        <value>WriteMapNullValue</value>
+                        <value>WriteDateUseDateFormat</value>
+                    </array>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!--配置多媒体解析器-->
+    <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver">
+        <!--        字符集编码-->
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!--        上传文件的大小限制   5M  5*1024*1024-->
+        <property name="maxUploadSize" value="5242880"/>
+    </bean>
+
+    <!--    声明服务名称-->
+    <dubbo:application name="dongyimai-manager-web"/>
+    <!--    配置注册中心地址-->
+    <dubbo:registry address="zookeeper://192.168.188.128:2181"/>
+    <!--    配置扫描服务所在的包-->
+    <dubbo:annotation package="com.offcn"/>
+
+
+
+</beans>
